@@ -1,0 +1,54 @@
+<project name="PROJECT" default="build" basedir=".">
+	<!-- Project dependent properties -->
+	<property name="jarfile" location="image-annotation.jar"/>
+	<property name="mainclass" value="ImageAnnotation"/>
+
+
+	<!-- Project independent properties -->
+	<property name="src" location="src"/>
+	<property name="dest" location="bin"/>
+	<property name="doc" location="doc"/>
+
+	<!-- Deletes build and documentation directories and removes jarfile -->
+	<target name="clean">
+		<delete dir="${dest}"/>
+		<delete dir="${doc}"/>
+		<delete file="${jarfile}"/>
+	</target>
+
+	<!--
+		 Compiles program to bin/
+		 Uses -Xlint:unchecked
+	-->
+	<target name="build">
+		<mkdir dir="${dest}"/>
+		<javac debug="true" srcdir="${src}" destdir="${dest}" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<!-- Creates Jarfile -->
+	<target name="jar" depends="build">
+		<jar destfile="${jarfile}" basedir="${dest}">
+			<manifest>
+				<attribute name="Main-Class" value="${mainclass}"/>
+			</manifest>
+			<fileset dir="." includes="assets/**"/>
+		</jar>
+	</target>
+
+	<!-- Creates Javadoc documentation in doc/ -->
+	<target name="doc">
+		<javadoc sourcepath="${src}" destdir="${doc}" author="true" version="true" private="true"/>
+	</target>
+
+	<target name="run" depends="build, get-args">
+		<java classname="${mainclass}" classpath="${dest}" fork="true" dir="${dest}">
+			<arg line="${args}"/>
+		</java>
+	</target>
+
+	<target name="get-args" unless="args">
+		<input addProperty="args" message="Arguments for ${mainclass}: "/>
+	</target>
+</project>
