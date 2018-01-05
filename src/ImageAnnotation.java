@@ -67,6 +67,11 @@ public class ImageAnnotation {
 			return;
 
 		File imagePath = new File(info[0]);
+		String imageName = imagePath.getName();
+		int index = imageName.lastIndexOf('.');
+		if(index != -1)
+			imageName = imageName.substring(0, index);
+
 		BufferedImage img = ImageIO.read(imagePath);
 		for(int i = 0; i<n; i++) {
 			int ind = 4*i + 2;
@@ -75,10 +80,14 @@ public class ImageAnnotation {
 			int w = Integer.parseInt(info[ind+2]);
 			int h = Integer.parseInt(info[ind+3]);
 			
-			BufferedImage selection = img.getSubimage(x, y, w, h);
 			String extension = "jpg";
-			String selectionPath = destination + "/" + String.format("%s_%d_%d_%dx%d", imagePath.getName(), x, y, w, h) + "." + extension;
-			ImageIO.write(selection, extension, new File(selectionPath));
+			String selectionName = String.format("%s_%d_%d_%dx%d", imageName, x, y, w, h) + "." + extension;
+
+			File selectionPath = new File(destination + "/" + selectionName);
+			if(!selectionPath.exists()) {
+				BufferedImage selection = img.getSubimage(x, y, w, h);
+				ImageIO.write(selection, extension, selectionPath);
+			}
 		}
 	}
 }
